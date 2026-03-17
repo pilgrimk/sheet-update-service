@@ -1,6 +1,7 @@
 from app.config import settings
 from app.services.google_client import GoogleClientFactory
 from app.services.mapping_config import match_metric_label, match_structure_label
+from app.utils.date_utils import try_parse_full_sheet_date
 
 
 class SheetStructureService:
@@ -14,15 +15,21 @@ class SheetStructureService:
     def parse_structure(self) -> dict:
         spreadsheet, worksheet, values = self.load_values()
 
+        warnings = []
+
         structure = {
             "spreadsheet_title": spreadsheet.title,
             "worksheet_title": worksheet.title,
             "weeks": [],
             "products": {},
             "row_count": len(values),
+            "warnings": warnings,
         }
 
         # Parse week columns from rows 2, 3, and 4 (1-based sheet rows)
+        # values[1] = week label row
+        # values[2] = week start row
+        # values[3] = week end row
         if len(values) >= 4:
             week_row = values[1]
             start_row = values[2]
@@ -32,16 +39,33 @@ class SheetStructureService:
 
             for col_idx in range(max_cols):
                 week_label = week_row[col_idx] if col_idx < len(week_row) else ""
-                start_date = start_row[col_idx] if col_idx < len(start_row) else ""
-                end_date = end_row[col_idx] if col_idx < len(end_row) else ""
+                start_date_raw = start_row[col_idx] if col_idx < len(start_row) else ""
+                end_date_raw = end_row[col_idx] if col_idx < len(end_row) else ""
 
-                if str(week_label).strip():
-                    structure["weeks"].append({
-                        "label": week_label,
-                        "start": start_date,
-                        "end": end_date,
+                if not str(week_label).strip():
+                    continue
+
+                # Validate that week start/end dates include year going forward.
+                # We still record the week either way so the resolver can decide how strict to be.
+                start_date_parsed = try_parse_full_sheet_date(start_date_raw)
+                end_date_parsed = try_parse_full_sheet_date(end_date_raw)
+
+                if (start_date_raw or end_date_raw) and (start_date_parsed is None or end_date_parsed is None):
+                    warnings.append({
+                        "type": "schema_warning",
+                        "message": "Week header missing year or using unsupported format. Expected M/D/YYYY or YYYY-MM-DD.",
                         "column_index_1based": col_idx + 1,
+                        "week_label": week_label,
+                        "start_raw": start_date_raw,
+                        "end_raw": end_date_raw,
                     })
+
+                structure["weeks"].append({
+                    "label": week_label,
+                    "start": start_date_raw,
+                    "end": end_date_raw,
+                    "column_index_1based": col_idx + 1,
+                })
 
         current_product = None
 

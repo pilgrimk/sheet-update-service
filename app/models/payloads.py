@@ -1,29 +1,43 @@
-from typing import List, Optional, Union
+from typing import List, Optional, Literal
 from pydantic import BaseModel, Field
 
 
-Number = Union[int, float]
-
-
-class SheetUpdateRecord(BaseModel):
+class SheetMetricRecord(BaseModel):
     date: str
     asin: str
-    parent_asin: Optional[str] = ""
-    parent_asin_attempted: Optional[str] = ""
-    sales_price: Optional[Number] = None
-    currency: Optional[str] = None
-    sales_rank: Optional[int] = None
-    category: Optional[str] = None
-    sub_category: Optional[str] = None
-    sub_category_rank: Optional[int] = None
-    bsr_present: Optional[str] = None
-    fail_reason: Optional[str] = ""
-    selected_price: Optional[Number] = None
-    selected_currency: Optional[str] = None
-    avg_offer_price: Optional[Number] = None
-    min_offer_price: Optional[Number] = None
-    offer_count: Optional[int] = None
+
+    parent_pageviews: Optional[float] = None
+    parent_units_ordered: Optional[float] = None
+    parent_conversion_rate: Optional[float] = None
+    sub_category_bsr: Optional[float] = None
+    average_price: Optional[float] = None
+    best_deal: Optional[float] = None
+    coupon: Optional[float] = None
+    sales: Optional[float] = None
+    sales_ly: Optional[float] = None
+    sales_yoy_change: Optional[float] = None
+    spend: Optional[float] = None
+    impressions: Optional[float] = None
+    clicks: Optional[float] = None
+    advertising_sales: Optional[float] = None
+    organic_sales: Optional[float] = None
+    cpc: Optional[float] = None
+    revenue_per_click: Optional[float] = None
+    roas: Optional[float] = None
+    cost_per_acquisition: Optional[float] = None
+    tacos: Optional[float] = None
+    profitability: Optional[float] = None
 
 
 class SheetUpdateRequest(BaseModel):
-    records: List[SheetUpdateRecord] = Field(default_factory=list)
+    records: List[SheetMetricRecord] = Field(default_factory=list)
+
+
+class TestMutationRequest(BaseModel):
+    mode: Literal[
+        "plan_only",
+        "apply_existing_updates",
+        "apply_with_new_weeks",
+        "apply_full",
+    ]
+    records: List[SheetMetricRecord] = Field(default_factory=list)

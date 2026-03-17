@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     default_worksheet_name: str = "Daily Data"
     google_service_account_file: str = "service_account.json"
 
+    require_year_in_week_headers: bool = True
+    allow_legacy_week_match: bool = False
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 

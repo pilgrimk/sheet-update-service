@@ -90,6 +90,59 @@ METRIC_LABEL_ALIASES = {
 }
 
 
+METRIC_ROW_ORDER = [
+    "parent_pageviews",
+    "parent_units_ordered",
+    "parent_conversion_rate",
+    "sub_category_bsr",
+    "average_price",
+    "best_deal",
+    "coupon",
+    "sales",
+    "sales_ly",
+    "sales_yoy_change",
+    "spend",
+    "impressions",
+    "clicks",
+    "advertising_sales",
+    "organic_sales",
+    "cpc",
+    "revenue_per_click",
+    "roas",
+    "cost_per_acquisition",
+    "tacos",
+    "profitability",
+]
+
+PREFERRED_METRIC_DISPLAY_LABELS = {
+    "parent_pageviews": "Parent Pageviews",
+    "parent_units_ordered": "Parent Units Ordered",
+    "parent_conversion_rate": "Parent Conversion Rate",
+    "sub_category_bsr": "Sub Category BSR",
+    "average_price": "Average Price",
+    "best_deal": "Best Deal",
+    "coupon": "Coupon",
+    "sales": "Sales",
+    "sales_ly": "Sales LY",
+    "sales_yoy_change": "Sales YoY Change",
+    "spend": "Spend",
+    "impressions": "Impressions",
+    "clicks": "Clicks",
+    "advertising_sales": "Advertising Sales",
+    "organic_sales": "Organic Sales",
+    "cpc": "CPC",
+    "revenue_per_click": "Revenue Per Click",
+    "roas": "ROAS",
+    "cost_per_acquisition": "Cost Per Acquisition",
+    "tacos": "TACoS",
+    "profitability": "Profitablity",
+}
+
+
+def get_preferred_metric_label(metric_key: str) -> str:
+    return PREFERRED_METRIC_DISPLAY_LABELS.get(metric_key, metric_key)
+
+
 def match_structure_label(cell_value: Optional[str]) -> Optional[str]:
     """
     Return the canonical structure key if the cell matches one of our known aliases.
