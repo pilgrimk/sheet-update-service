@@ -219,11 +219,17 @@ class SheetWriter:
         for block in sorted_blocks:
             insert_after = block["insert_after_row"]
             total_rows = block["total_rows_required"]
+            current_row_count = worksheet.row_count
 
-            worksheet.insert_rows(
-                [[""] * worksheet.col_count] * total_rows,
-                row=insert_after + 1
-            )
+            # Append to bottom of sheet if insertion point is at or beyond current grid size.
+            # Google Sheets / gspread insert_rows can fail at the exact end-of-sheet boundary.
+            if insert_after >= current_row_count:
+                worksheet.add_rows(total_rows)
+            else:
+                worksheet.insert_rows(
+                    [[""] * worksheet.col_count] * total_rows,
+                    row=insert_after + 1
+                )
 
             batch_payload = []
 

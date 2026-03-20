@@ -17,6 +17,7 @@ STRUCTURE_LABEL_ALIASES = {
     "asin_label": {
         "parent asin",
         "product asin",
+        "asin",
     },
 }
 
